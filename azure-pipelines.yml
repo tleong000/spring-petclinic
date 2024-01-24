@@ -24,11 +24,18 @@ steps:
 - script: |
     curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=v8&source=github" | tar -zx
     chmod a+x cf
-    ./cf target 
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'DeploytoCF'
+    ./cf target api.sys.wellington.cf-app.com
+    ./cf login -u admin -p ZKFIW3zjF10ryWQR8AenhM3LkjtNKz4_ -o demo -s space2
+    ./cf service testCups || ./cf cups testCups -p '{"host":"db.example.com","username":"dbuser","password":"dbpass","dbname":"mydb"}'
+  displayName: 'DeployServices'
 
 - script: |
     echo "Deploy"
-  displayName: 'Deploy'
+    curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=v8&source=github" | tar -zx
+    chmod a+x cf
+    ./cf target api.sys.wellington.cf-app.com
+    ./cf login -u admin -p ZKFIW3zjF10ryWQR8AenhM3LkjtNKz4_ -o demo -s space2
+    ./cf push spring-petclinic --no-start
+    ./cf bs spring-petclinic testCups
+    ./cf start spring-petclinic
+  displayName: 'DeployApp'
