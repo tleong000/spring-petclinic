@@ -10,9 +10,8 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Build'
 - task: Maven@4
+  displayName: BuildandTest
   inputs:
     mavenPomFile: 'pom.xml'
     publishJUnitResults: true
@@ -23,9 +22,12 @@ steps:
     effectivePomSkip: false
     sonarQubeRunAnalysis: false
 - script: |
+    curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=v8&source=github" | tar -zx
+    chmod a+x cf
+    ./cf target 
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
-  displayName: 'Test'
+  displayName: 'DeploytoCF'
 
 - script: |
     echo "Deploy"
