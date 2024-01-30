@@ -30,12 +30,25 @@ steps:
   displayName: 'DeployServices'
 
 - script: |
-    echo "Deploy"
+    echo "Deploy NEW"
     curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=v8&source=github" | tar -zx
     chmod a+x cf
     ./cf api api.sys.wellington.cf-app.com
     ./cf login -u admin -p ZKFIW3zjF10ryWQR8AenhM3LkjtNKz4_ -o demo -s space2
-    ./cf push spring-petclinic --no-start
-    ./cf bs spring-petclinic testCups
-    ./cf start spring-petclinic
-  displayName: 'DeployApp'
+    ./cf push spring-petclinic-new --no-start
+    ./cf bs spring-petclinic-new testCups
+    ./cf start spring-petclinic-new
+  displayName: 'DeployNewApp'
+
+- script: |
+    echo "Test"
+    curl -w "%{response_code}" -f https://spring-petclinic-new.apps.wellington.cf-app.com > /dev/null
+    if [ $? -ne 0 ]; then echo "FAIL TEST"; exit 1; fi
+  displayName: 'TestApp'
+
+- script: |
+    echo "Mapping Routes..."
+    ./cf map-route spring-petclinic-new apps.wellington.cf-app.com --hostname spring-petclinic
+    ./cf unmap-route spring-petclinic apps.wellington.cf-app.com --hostname spring-petclinic
+  displayName: 'MapRoute'
+
